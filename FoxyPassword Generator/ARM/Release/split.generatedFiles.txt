@@ -1,0 +1,2 @@
+ARM\Release\split.pri
+ARM\Release\split.map.txt

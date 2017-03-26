@@ -1,0 +1,13 @@
+﻿[ResourceMetadata]
+"ResourceDimensions"		"scale-200"
+"ResourceDimensions"		"language-en-us"
+
+[Files]
+"C:\Users\Alex Fox\Documents\Visual Studio 2017\Projects\FoxyPassword Generator\FoxyPassword Generator\Release\Upload\split.pri"			"resources.pri"
+"C:\Users\Alex Fox\Documents\Visual Studio 2017\Projects\FoxyPassword Generator\FoxyPassword Generator\Release\PackageUploadLayout\Assets\Wide310x150Logo.scale-200.png"			"Assets\Wide310x150Logo.scale-200.png"
+"C:\Users\Alex Fox\Documents\Visual Studio 2017\Projects\FoxyPassword Generator\FoxyPassword Generator\Release\PackageUploadLayout\Assets\StoreLogo.png"			"Assets\StoreLogo.png"
+"C:\Users\Alex Fox\Documents\Visual Studio 2017\Projects\FoxyPassword Generator\FoxyPassword Generator\Release\PackageUploadLayout\Assets\Square44x44Logo.scale-200.png"			"Assets\Square44x44Logo.scale-200.png"
+"C:\Users\Alex Fox\Documents\Visual Studio 2017\Projects\FoxyPassword Generator\FoxyPassword Generator\Release\PackageUploadLayout\Assets\Square44x44Logo.targetsize-24_altform-unplated.png"			"Assets\Square44x44Logo.targetsize-24_altform-unplated.png"
+"C:\Users\Alex Fox\Documents\Visual Studio 2017\Projects\FoxyPassword Generator\FoxyPassword Generator\Release\PackageUploadLayout\Assets\Square150x150Logo.scale-200.png"			"Assets\Square150x150Logo.scale-200.png"
+"C:\Users\Alex Fox\Documents\Visual Studio 2017\Projects\FoxyPassword Generator\FoxyPassword Generator\Release\PackageUploadLayout\Assets\SplashScreen.scale-200.png"			"Assets\SplashScreen.scale-200.png"
+"C:\Users\Alex Fox\Documents\Visual Studio 2017\Projects\FoxyPassword Generator\FoxyPassword Generator\Release\PackageUploadLayout\Assets\LockScreenLogo.scale-200.png"			"Assets\LockScreenLogo.scale-200.png"
