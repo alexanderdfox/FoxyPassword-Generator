@@ -4,5 +4,28 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:FoxyPassword_Generator"
     RequestedTheme="Light">
-
+    
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Professional color scheme -->
+            <SolidColorBrush x:Key="PrimaryBrush" Color="#0078D4"/>
+            <SolidColorBrush x:Key="SecondaryBrush" Color="#106EBE"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#107C10"/>
+            <SolidColorBrush x:Key="WarningBrush" Color="#D83B01"/>
+            <SolidColorBrush x:Key="SuccessBrush" Color="#107C10"/>
+            
+            <!-- Modern typography -->
+            <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+            </Style>
+            
+            <Style x:Key="BodyTextStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>

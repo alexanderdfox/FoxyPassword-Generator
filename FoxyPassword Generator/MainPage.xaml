@@ -5,19 +5,231 @@
     xmlns:local="using:FoxyPassword_Generator"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-    <Grid Opacity="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="500" Margin="0,0,0,0" Width="1200">
-        <TextBox x:Name="password" HorizontalAlignment="Center" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="50" Width="900" Margin="0,0,0,0" TextAlignment="Center"/>
-        <TextBox x:Name="customChars" HorizontalAlignment="Center" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="50" Width="500" Margin="150,0,0,350" TextAlignment="Center"/>
-        <Button x:Name="generate" Content="Generate Password" HorizontalAlignment="Center" Margin="0,0,0,100" VerticalAlignment="Center" Height="28" RenderTransformOrigin="0.315,0.477" Click="generate_Click"></Button>
-        <Slider x:Name="passSize" HorizontalAlignment="Center" VerticalAlignment="Center" Width="818" Margin="0,0,0,-100" Value="12" Minimum="1"/>
-        <CheckBox x:Name="specialsCheck" Content="Special Characters" HorizontalAlignment="center" Height="44" Margin="-600,0,0,200" VerticalAlignment="center" Width="155" IsChecked="True"/>
-        <CheckBox x:Name="vowelsCheck" Content="Vowels" HorizontalAlignment="center" Height="44" Margin="-200,0,0,200" VerticalAlignment="center" Width="155" IsChecked="True"/>
-        <CheckBox x:Name="constanantsCheck" Content="Constanants" HorizontalAlignment="center" Height="44" Margin="100,0,0,200" VerticalAlignment="center" Width="155" IsChecked="True"/>
-        <CheckBox x:Name="numbersCheck" Content="Numbers" HorizontalAlignment="center" Height="44" Margin="400,0,0,200" VerticalAlignment="center" Width="155" IsChecked="True"/>
-        <CheckBox x:Name="customBool" Content="Custom Characters" HorizontalAlignment="center" Height="44" Margin="-600,0,0,350" VerticalAlignment="center" Width="155" IsChecked="False"/>
-        <RadioButton x:Name="upperButton" Content="UPPERCASE" HorizontalAlignment="center" Margin="600,0,0,250" VerticalAlignment="center" GroupName="typeCase"/>
-        <RadioButton x:Name="lowerButton" Content="lowercase" HorizontalAlignment="center" Margin="600,0,0,200" VerticalAlignment="center" GroupName="typeCase"/>
-        <RadioButton x:Name="bothButton" Content="Both" HorizontalAlignment="center" Margin="600,0,0,150" VerticalAlignment="center" GroupName="typeCase" IsChecked="True"/>
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{ThemeResource SystemAccentColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"
+                                            Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsPointerOver" Value="True">
+                    <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight1}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{ThemeResource SystemAccentColorDark1}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundAltHighBrush}"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style x:Key="ModernCheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="0,4"/>
+        </Style>
+
+        <Style x:Key="ModernSliderStyle" TargetType="Slider">
+            <Setter Property="Foreground" Value="{ThemeResource SystemAccentColor}"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24" MaxWidth="800" HorizontalAlignment="Center">
+                
+                <!-- Header -->
+                <StackPanel Margin="0,0,0,32" HorizontalAlignment="Center">
+                    <TextBlock Text="🔐 FoxyPassword Generator" 
+                               FontSize="32" 
+                               FontWeight="Bold" 
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Generate secure, random passwords with professional-grade cryptography" 
+                               FontSize="16" 
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                               HorizontalAlignment="Center"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <!-- Generated Password Display -->
+                <Border Background="{ThemeResource SystemControlBackgroundAltHighBrush}" 
+                        BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,24">
+                    <StackPanel>
+                        <TextBlock Text="Generated Password" 
+                                   FontSize="14" 
+                                   FontWeight="SemiBold" 
+                                   Margin="0,0,0,8"/>
+                        <Grid>
+                            <TextBox x:Name="passwordDisplay" 
+                                     Style="{StaticResource ModernTextBoxStyle}"
+                                     FontSize="18" 
+                                     FontFamily="Consolas"
+                                     IsReadOnly="True"
+                                     TextAlignment="Center"
+                                     Margin="0,0,8,0"/>
+                            <Button x:Name="copyButton" 
+                                    Content="Copy" 
+                                    Style="{StaticResource ModernButtonStyle}"
+                                    HorizontalAlignment="Right"
+                                    Width="80"
+                                    Click="copyButton_Click"/>
+                        </Grid>
+                        
+                        <!-- Password Strength Indicator -->
+                        <StackPanel x:Name="strengthIndicator" Margin="0,12,0,0">
+                            <TextBlock Text="Password Strength:" 
+                                       FontSize="12" 
+                                       Margin="0,0,0,4"/>
+                            <ProgressBar x:Name="strengthBar" 
+                                         Height="6" 
+                                         Maximum="100" 
+                                         Value="0"/>
+                            <TextBlock x:Name="strengthText" 
+                                       Text="Very Weak" 
+                                       FontSize="12" 
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Password Length -->
+                <StackPanel Margin="0,0,0,24">
+                    <TextBlock Text="Password Length: " 
+                               FontSize="16" 
+                               FontWeight="SemiBold" 
+                               Margin="0,0,0,8"/>
+                    <Grid>
+                        <Slider x:Name="passSize" 
+                                Style="{StaticResource ModernSliderStyle}"
+                                Minimum="8" 
+                                Maximum="128" 
+                                Value="16" 
+                                TickFrequency="8"
+                                TickPlacement="BottomRight"
+                                Margin="0,0,0,8"/>
+                        <TextBlock x:Name="lengthDisplay" 
+                                   Text="16 characters" 
+                                   HorizontalAlignment="Right" 
+                                   VerticalAlignment="Top"
+                                   FontSize="14"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Character Options -->
+                <StackPanel Margin="0,0,0,24">
+                    <TextBlock Text="Character Types" 
+                               FontSize="16" 
+                               FontWeight="SemiBold" 
+                               Margin="0,0,0,12"/>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <CheckBox x:Name="uppercaseCheck" 
+                                      Content="Uppercase Letters (A-Z)" 
+                                      Style="{StaticResource ModernCheckBoxStyle}"
+                                      IsChecked="True"/>
+                            <CheckBox x:Name="lowercaseCheck" 
+                                      Content="Lowercase Letters (a-z)" 
+                                      Style="{StaticResource ModernCheckBoxStyle}"
+                                      IsChecked="True"/>
+                            <CheckBox x:Name="numbersCheck" 
+                                      Content="Numbers (0-9)" 
+                                      Style="{StaticResource ModernCheckBoxStyle}"
+                                      IsChecked="True"/>
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                            <CheckBox x:Name="specialsCheck" 
+                                      Content="Special Characters (!@#$%^&*)" 
+                                      Style="{StaticResource ModernCheckBoxStyle}"
+                                      IsChecked="True"/>
+                            <CheckBox x:Name="similarCheck" 
+                                      Content="Exclude Similar Characters (l, 1, I, 0, O)" 
+                                      Style="{StaticResource ModernCheckBoxStyle}"
+                                      IsChecked="False"/>
+                            <CheckBox x:Name="ambiguousCheck" 
+                                      Content="Exclude Ambiguous Characters ({ } [ ] ( ) / \ ' &quot; ` ~ , ; : . < >)" 
+                                      Style="{StaticResource ModernCheckBoxStyle}"
+                                      IsChecked="False"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Custom Characters -->
+                <StackPanel Margin="0,0,0,24">
+                    <CheckBox x:Name="customBool" 
+                              Content="Include Custom Characters" 
+                              Style="{StaticResource ModernCheckBoxStyle}"
+                              IsChecked="False"/>
+                    <TextBox x:Name="customChars" 
+                             Style="{StaticResource ModernTextBoxStyle}"
+                             PlaceholderText="Enter custom characters (e.g., @#$%)"
+                             Margin="0,8,0,0"
+                             IsEnabled="{Binding IsChecked, ElementName=customBool}"/>
+                </StackPanel>
+
+                <!-- Generate Button -->
+                <Button x:Name="generateButton" 
+                        Content="Generate Secure Password" 
+                        Style="{StaticResource ModernButtonStyle}"
+                        FontSize="16"
+                        Padding="32,16"
+                        HorizontalAlignment="Center"
+                        Click="generate_Click"/>
+
+                <!-- Security Notice -->
+                <Border Background="{ThemeResource SystemAccentColorLight3}" 
+                        CornerRadius="8" 
+                        Padding="16" 
+                        Margin="0,24,0,0">
+                    <StackPanel>
+                        <TextBlock Text="🔒 Security Features" 
+                                   FontSize="14" 
+                                   FontWeight="SemiBold" 
+                                   Margin="0,0,0,8"/>
+                        <TextBlock Text="• Uses cryptographically secure random number generation&#x0a;• Passwords are generated locally on your device&#x0a;• No data is transmitted or stored&#x0a;• Supports up to 128 character passwords" 
+                                   FontSize="12" 
+                                   TextWrapping="Wrap"
+                                   LineHeight="18"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

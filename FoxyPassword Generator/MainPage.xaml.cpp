@@ -1,10 +1,13 @@
 ﻿//
 // MainPage.xaml.cpp
-// Implementation of the MainPage class.
+// Implementation of the MainPage class with secure password generation.
 //
 
 #include "pch.h"
 #include "MainPage.xaml.h"
+#include <random>
+#include <algorithm>
+#include <cctype>
 
 using namespace FoxyPassword_Generator;
 
@@ -18,263 +21,235 @@ using namespace Windows::UI::Xaml::Data;
 using namespace Windows::UI::Xaml::Input;
 using namespace Windows::UI::Xaml::Media;
 using namespace Windows::UI::Xaml::Navigation;
+using namespace Windows::ApplicationModel::DataTransfer;
 using namespace std;
 
 MainPage::MainPage()
 {
 	InitializeComponent();
-	numberGen();
+	initializeSecureRandom();
+	
+	// Set up event handlers
+	passSize->ValueChanged += ref new RangeBaseValueChangedEventHandler(this, &MainPage::passSize_ValueChanged);
+	
+	// Initialize UI
+	lengthDisplay->Text = "16 characters";
+	strengthBar->Value = 0;
+	strengthText->Text = "Generate a password to see strength";
+}
+
+void FoxyPassword_Generator::MainPage::initializeSecureRandom()
+{
+	try {
+		// Use hardware random number generator if available
+		randomDevice = std::make_unique<std::random_device>();
+		randomGenerator = std::make_unique<std::mt19937>((*randomDevice)());
+	}
+	catch (...) {
+		// Fallback to system time if hardware RNG is not available
+		randomGenerator = std::make_unique<std::mt19937>(static_cast<unsigned int>(time(nullptr)));
+	}
+}
+
+int FoxyPassword_Generator::MainPage::getSecureRandomNumber(int min, int max)
+{
+	if (max <= min) return min;
+	
+	std::uniform_int_distribution<int> distribution(min, max - 1);
+	return distribution(*randomGenerator);
+}
+
+wchar_t FoxyPassword_Generator::MainPage::getRandomChar(String ^ charSet)
+{
+	if (charSet->Length() == 0) return L' ';
+	
+	int index = getSecureRandomNumber(0, charSet->Length());
+	return charSet[index];
 }
 
 void FoxyPassword_Generator::MainPage::generate_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	String ^ actPass = passWord(int(passSize->Value),specialsCheck->IsChecked->Value,vowelsCheck->IsChecked->Value,constanantsCheck->IsChecked->Value,numbersCheck->IsChecked->Value,
-		customBool->IsChecked->Value, customChars->Text, upperButton->IsChecked->Value,lowerButton->IsChecked->Value);
-	password->Text = actPass;
+	try {
+		// Validate input
+		if (!uppercaseCheck->IsChecked->Value && !lowercaseCheck->IsChecked->Value && 
+			!numbersCheck->IsChecked->Value && !specialsCheck->IsChecked->Value && 
+			!customBool->IsChecked->Value) {
+			passwordDisplay->Text = "Please select at least one character type";
+			return;
+		}
+
+		int length = static_cast<int>(passSize->Value);
+		if (length < 8 || length > 128) {
+			passwordDisplay->Text = "Password length must be between 8 and 128 characters";
+			return;
+		}
+
+		// Generate password
+		String ^ generatedPassword = generateSecurePassword(
+			length,
+			uppercaseCheck->IsChecked->Value,
+			lowercaseCheck->IsChecked->Value,
+			numbersCheck->IsChecked->Value,
+			specialsCheck->IsChecked->Value,
+			similarCheck->IsChecked->Value,
+			ambiguousCheck->IsChecked->Value,
+			customBool->IsChecked->Value ? customChars->Text : ""
+		);
+
+		passwordDisplay->Text = generatedPassword;
+
+		// Calculate and display strength
+		int strength = calculatePasswordStrength(generatedPassword);
+		strengthBar->Value = strength;
+		strengthText->Text = getStrengthDescription(strength);
+	}
+	catch (Exception^ ex) {
+		passwordDisplay->Text = "Error generating password: " + ex->Message;
+	}
 }
 
-wchar_t FoxyPassword_Generator::MainPage::getChar(bool specialChars, bool vowelChars, bool constChars, bool numChars, bool customBool, String ^ customChars) {
-
-	String ^ numbers = "0123456789";
-	String ^ constanants = "bcdfghjklmnpqrstvwxyz";
-	String ^ vowels = "aeiouy";
-	String ^ specials = "!#$&*-_.";
-	String ^ all = specials + vowels + constanants + numbers;
-	String ^ allC = specials + vowels + constanants + numbers + customChars;
-	String ^ nC = numbers + customChars;
-	String ^ cC = constanants + customChars;
-	String ^ vC = vowels + customChars;
-	String ^ sC = specials + customChars;
-	String ^ ncv = numbers + constanants + vowels;
-	String ^ cns = constanants + numbers + specials;
-	String ^ vns = vowels + numbers + specials;
-	String ^ vcs = vowels + constanants + specials;
-	String ^ vc = vowels + constanants;
-	String ^ vs = vowels + specials;
-	String ^ nc = numbers + constanants;
-	String ^ ns = numbers + specials;
-	String ^ cs = constanants + specials;
-	String ^ vn = vowels + numbers;
-	String ^ ncvC = numbers + constanants + vowels + customChars;
-	String ^ cnsC = constanants + numbers + specials + customChars;
-	String ^ vnsC = vowels + numbers + specials + customChars;
-	String ^ vcsC = vowels + constanants + specials + customChars;
-	String ^ vcC = vowels + constanants + customChars;
-	String ^ vsC = vowels + specials + customChars;
-	String ^ ncC = numbers + constanants + customChars;
-	String ^ nsC = numbers + specials + customChars;
-	String ^ csC = constanants + specials + customChars;
-	String ^ vnC = vowels + numbers + customChars;
-	int n = rand() % numbers->Length();
-	int v = rand() % vowels->Length();
-	int c = rand() % constanants->Length();
-	int s = rand() % specials->Length();
-	int Cn = rand() % nC->Length();
-	int Cv = rand() % vC->Length();
-	int Cc = rand() % cC->Length();
-	int Cs = rand() % sC->Length();
-	int a = rand() % all->Length();
-	int aC = rand() % allC->Length();
-	int C = customChars->Length();
-	if (C > 0) {
-		C = rand() % customChars->Length();
-	}
-	else if (C == 0 && customBool == true) {
-		customBool = false;
-	}
-	int NCV = rand() % ncv->Length();
-	int CNS = rand() % cns->Length();
-	int VNS = rand() % vns->Length();
-	int VCS = rand() % vcs->Length();
-	int VC = rand() % vc->Length();
-	int VS = rand() % vs->Length();
-	int NC = rand() % nc->Length();
-	int NS = rand() % ns->Length();
-	int CS = rand() % cs->Length();
-	int VN = rand() % vn->Length();
-	int NCVc = rand() % ncvC->Length();
-	int CNSc = rand() % cnsC->Length();
-	int VNSc = rand() % vnsC->Length();
-	int VCSc = rand() % vcsC->Length();
-	int VCc = rand() % vcC->Length();
-	int VSc = rand() % vsC->Length();
-	int NCc = rand() % ncC->Length();
-	int NSc = rand() % nsC->Length();
-	int CSc = rand() % csC->Length();
-	int VNc = rand() % vnC->Length();
-	wchar_t theChar;
-
-	if (specialChars && vowelChars && constChars && numChars && customBool) {
-		auto it = allC->Begin();
-		theChar = it[aC];
-	}
-	else if (!specialChars && !vowelChars && !constChars && !numChars && customBool) {
-		auto it = customChars->Begin();
-		theChar = it[C];
-	}
-	else if (!specialChars && !vowelChars && !constChars && numChars && customBool) {
-		auto it = nC->Begin();
-		theChar = it[Cn];
-	}
-	else if (!specialChars && !vowelChars && constChars && !numChars && customBool) {
-		auto it = cC->Begin();
-		theChar = it[Cc];
-	}
-	else if (!specialChars && vowelChars && !constChars && !numChars && customBool) {
-		auto it = vC->Begin();
-		theChar = it[Cv];
-	}
-	else if (specialChars && !vowelChars && !constChars && !numChars && customBool) {
-		auto it = sC->Begin();
-		theChar = it[Cs];
-	}
-	else if (!specialChars && vowelChars && constChars && numChars && customBool) {
-		auto it = ncvC->Begin();
-		theChar = it[NCVc];
-	}
-	else if (specialChars && !vowelChars && constChars && numChars && customBool) {
-		auto it = cnsC->Begin();
-		theChar = it[CNSc];
-	}
-	else if (specialChars && vowelChars && !constChars && numChars && customBool) {
-		auto it = vnsC->Begin();
-		theChar = it[VNSc];
-	}
-	else if (specialChars && vowelChars && constChars && !numChars && customBool) {
-		auto it = vcsC->Begin();
-		theChar = it[VCSc];
-	}
-	else if (!specialChars && vowelChars && constChars && !numChars && customBool) {
-		auto it = vcC->Begin();
-		theChar = it[VCc];
-	}
-	else if (!specialChars && !vowelChars && constChars && numChars && customBool) {
-		auto it = ncC->Begin();
-		theChar = it[NCc];
-	}
-	else if (!specialChars && vowelChars && !constChars && numChars && customBool) {
-		auto it = vnC->Begin();
-		theChar = it[VNc];
-	}
-	else if (specialChars && !vowelChars && !constChars && numChars && customBool) {
-		auto it = nsC->Begin();
-		theChar = it[NSc];
-	}
-	else if (specialChars && vowelChars && !constChars && !numChars && customBool) {
-		auto it = vsC->Begin();
-		theChar = it[VSc];
-	}
-	else if (specialChars && !vowelChars && constChars && !numChars && customBool) {
-		auto it = csC->Begin();
-		theChar = it[CSc];
-	}
-	else if (specialChars && vowelChars && constChars && numChars && !customBool) {
-		auto it = all->Begin();
-		theChar = it[a];
-	}
-	else if (!specialChars && !vowelChars && !constChars && numChars && !customBool) {
-		auto it = numbers->Begin();
-		theChar = it[n];
-	}
-	else if (!specialChars && !vowelChars && constChars && !numChars && !customBool) {
-		auto it = constanants->Begin();
-		theChar = it[c];
-	}
-	else if (!specialChars && vowelChars && !constChars && !numChars && !customBool) {
-		auto it = vowels->Begin();
-		theChar = it[v];
-	}
-	else if (specialChars && !vowelChars && !constChars && !numChars && !customBool) {
-		auto it = specials->Begin();
-		theChar = it[s];
-	}
-	else if (!specialChars && vowelChars && constChars && numChars && !customBool) {
-		auto it = ncv->Begin();
-		theChar = it[NCV];
-	}
-	else if (specialChars && !vowelChars && constChars && numChars && !customBool) {
-		auto it = cns->Begin();
-		theChar = it[CNS];
-	}
-	else if (specialChars && vowelChars && !constChars && numChars && !customBool) {
-		auto it = vns->Begin();
-		theChar = it[VNS];
-	}
-	else if (specialChars && vowelChars && constChars && !numChars && !customBool) {
-		auto it = vcs->Begin();
-		theChar = it[VCS];
-	}
-	else if (!specialChars && vowelChars && constChars && !numChars && !customBool) {
-		auto it = vc->Begin();
-		theChar = it[VC];
-	}
-	else if (!specialChars && !vowelChars && constChars && numChars && !customBool) {
-		auto it = nc->Begin();
-		theChar = it[NC];
-	}
-	else if (!specialChars && vowelChars && !constChars && numChars && !customBool) {
-		auto it = vn->Begin();
-		theChar = it[VN];
-	}
-	else if (specialChars && !vowelChars && !constChars && numChars && !customBool) {
-		auto it = ns->Begin();
-		theChar = it[NS];
-	}
-	else if (specialChars && vowelChars && !constChars && !numChars && !customBool) {
-		auto it = vs->Begin();
-		theChar = it[VS];
-	}
-	else if (specialChars && !vowelChars && constChars && !numChars && !customBool) {
-		auto it = cs->Begin();
-		theChar = it[CS];
-	}
-
-	return theChar;
-}
-
-String ^ FoxyPassword_Generator::MainPage::passWord(int length, bool specialChars, bool vowelChars, bool constChars, bool numChars, bool customBool, String ^ customChars, bool upperOnly, bool lowerOnly) {
-	String ^ pass;
-	int r = rand() % 5;
-
-	for (int i = 1; i <= length; i++) {
-
-		int r = rand() % 5;
-
-		if ((upperOnly && lowerOnly) || (!upperOnly && !lowerOnly)) {
-			if (r % 2 == 1) {
-				wchar_t theChar = tolower(getChar(specialChars, vowelChars, constChars, numChars, customBool, customChars));
-				pass += theChar.ToString();
-			}
-			else {
-				wchar_t theChar = toupper(getChar(specialChars, vowelChars, constChars, numChars, customBool, customChars));
-				pass += theChar.ToString();
-			}
-		}
-		else if (upperOnly && !lowerOnly) {
-			wchar_t theChar = toupper(getChar(specialChars, vowelChars, constChars, numChars, customBool, customChars));
-			pass += theChar.ToString();
-		}
-		else if (!upperOnly && lowerOnly) {
-			wchar_t theChar = tolower(getChar(specialChars, vowelChars, constChars, numChars, customBool, customChars));
-			pass += theChar.ToString();
-		}
-		else {
-			pass = "";
-		}
-
-	}
-
-	if (pass == "") {
-		pass = "ERROR!";
-	}
-
-	return pass;
-}
-
-int FoxyPassword_Generator::MainPage::numberGen()
+String ^ FoxyPassword_Generator::MainPage::generateSecurePassword(int length, bool uppercase, bool lowercase, bool numbers, bool specials, bool excludeSimilar, bool excludeAmbiguous, String ^ customChars)
 {
-	srand(int(time(0)));
-	int myRand = rand() % int(time(0));
-	srand(myRand);
-	return myRand;
+	// Define character sets
+	String ^ uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	String ^ lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
+	String ^ numberChars = "0123456789";
+	String ^ specialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+	
+	// Apply exclusions
+	if (excludeSimilar) {
+		uppercaseChars = uppercaseChars->Replace("I", "")->Replace("O", "");
+		lowercaseChars = lowercaseChars->Replace("l", "");
+		numberChars = numberChars->Replace("0", "")->Replace("1", "");
+	}
+	
+	if (excludeAmbiguous) {
+		specialChars = specialChars->Replace("{", "")->Replace("}", "")->Replace("[", "")->Replace("]", "")
+			->Replace("(", "")->Replace(")", "")->Replace("/", "")->Replace("\\", "")
+			->Replace("'", "")->Replace("\"", "")->Replace("`", "")->Replace("~", "")
+			->Replace(",", "")->Replace(";", "")->Replace(":", "")->Replace(".", "")
+			->Replace("<", "")->Replace(">", "");
+	}
+
+	// Build available character set
+	String ^ availableChars = "";
+	if (uppercase) availableChars += uppercaseChars;
+	if (lowercase) availableChars += lowercaseChars;
+	if (numbers) availableChars += numberChars;
+	if (specials) availableChars += specialChars;
+	if (customChars->Length() > 0) availableChars += customChars;
+
+	if (availableChars->Length() == 0) {
+		throw ref new Exception("No character types selected");
+	}
+
+	// Generate password ensuring at least one character from each selected type
+	String ^ password = "";
+	
+	// First, ensure we have at least one character from each selected type
+	if (uppercase && password->Length() < length) {
+		password += getRandomChar(uppercaseChars);
+	}
+	if (lowercase && password->Length() < length) {
+		password += getRandomChar(lowercaseChars);
+	}
+	if (numbers && password->Length() < length) {
+		password += getRandomChar(numberChars);
+	}
+	if (specials && password->Length() < length) {
+		password += getRandomChar(specialChars);
+	}
+	if (customChars->Length() > 0 && password->Length() < length) {
+		password += getRandomChar(customChars);
+	}
+
+	// Fill the rest with random characters
+	while (password->Length() < length) {
+		password += getRandomChar(availableChars);
+	}
+
+	// Shuffle the password to avoid predictable patterns
+	std::wstring passwordStr(password->Data());
+	std::shuffle(passwordStr.begin(), passwordStr.end(), *randomGenerator);
+	
+	return ref new String(passwordStr.c_str());
+}
+
+int FoxyPassword_Generator::MainPage::calculatePasswordStrength(String ^ password)
+{
+	if (password->Length() == 0) return 0;
+
+	int score = 0;
+	bool hasUppercase = false, hasLowercase = false, hasNumbers = false, hasSpecials = false;
+	
+	// Length bonus
+	score += min(password->Length() * 4, 40);
+	
+	// Character variety bonus
+	for (int i = 0; i < password->Length(); i++) {
+		wchar_t c = password[i];
+		if (isupper(c)) hasUppercase = true;
+		else if (islower(c)) hasLowercase = true;
+		else if (isdigit(c)) hasNumbers = true;
+		else hasSpecials = true;
+	}
+	
+	if (hasUppercase) score += 10;
+	if (hasLowercase) score += 10;
+	if (hasNumbers) score += 10;
+	if (hasSpecials) score += 10;
+	
+	// Bonus for mixed case
+	if (hasUppercase && hasLowercase) score += 10;
+	
+	// Bonus for numbers and letters
+	if (hasNumbers && (hasUppercase || hasLowercase)) score += 10;
+	
+	// Bonus for special characters
+	if (hasSpecials) score += 15;
+	
+	// Penalty for all same case
+	if (!hasUppercase || !hasLowercase) score -= 10;
+	
+	// Penalty for all numbers
+	if (hasNumbers && !hasUppercase && !hasLowercase && !hasSpecials) score -= 20;
+	
+	return max(0, min(100, score));
+}
+
+String ^ FoxyPassword_Generator::MainPage::getStrengthDescription(int strength)
+{
+	if (strength < 20) return "Very Weak";
+	else if (strength < 40) return "Weak";
+	else if (strength < 60) return "Fair";
+	else if (strength < 80) return "Good";
+	else if (strength < 90) return "Strong";
+	else return "Very Strong";
+}
+
+void FoxyPassword_Generator::MainPage::copyButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	if (passwordDisplay->Text->Length() > 0 && passwordDisplay->Text != "Generate a password to see strength") {
+		DataPackage^ dataPackage = ref new DataPackage();
+		dataPackage->SetText(passwordDisplay->Text);
+		Clipboard::SetContent(dataPackage);
+		
+		// Visual feedback
+		copyButton->Content = "Copied!";
+		Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal, ref new Windows::UI::Core::DispatchedHandler([this]() {
+			Windows::System::Threading::ThreadPoolTimer::CreateTimer(
+				ref new Windows::System::Threading::TimerElapsedHandler([this](Windows::System::Threading::ThreadPoolTimer^ timer) {
+					Dispatcher->RunAsync(Windows::UI::Core::CoreDispatcherPriority::Normal, ref new Windows::UI::Core::DispatchedHandler([this]() {
+						copyButton->Content = "Copy";
+					}));
+				}), TimeSpan{ 20000000 } // 2 seconds
+			);
+		}));
+	}
+}
+
+void FoxyPassword_Generator::MainPage::passSize_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
+{
+	int length = static_cast<int>(e->NewValue);
+	lengthDisplay->Text = length.ToString() + " characters";
 }
