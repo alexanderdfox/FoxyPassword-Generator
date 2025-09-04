@@ -10,7 +10,7 @@
     <MinimumVisualStudioVersion>17.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
     <ApplicationType>Windows Store</ApplicationType>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.17763.0</WindowsTargetPlatformMinVersion>
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
     
@@ -20,7 +20,7 @@
     <WindowsPackageType>MSIX</WindowsPackageType>
   </PropertyGroup>
 
-  <!-- WinUI 3 Release Configuration -->
+  <!-- WinUI 3 Release Configuration - x64 Only -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -49,8 +49,58 @@
     <WindowsAppSDKBootstrapAutoInitialize>true</WindowsAppSDKBootstrapAutoInitialize>
   </PropertyGroup>
 
-  <!-- WinUI 3 Debug Configuration -->
+  <!-- WinUI 3 Debug Configuration - x64 Only -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    
+    <!-- WinUI 3 Debug Security Settings -->
+    <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+    <AppxPackageSigningTimestampServer>http://timestamp.digicert.com</AppxPackageSigningTimestampServer>
+    
+    <!-- WinUI 3 Debug Compiler Flags -->
+    <AdditionalOptions>/guard:cf /sdl /GS /RTC1 %(AdditionalOptions)</AdditionalOptions>
+    <BufferSecurityCheck>true</BufferSecurityCheck>
+    <ControlFlowGuard>true</ControlFlowGuard>
+    
+    <!-- WinUI 3 Specific -->
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <WindowsAppSDKBootstrapAutoInitialize>true</WindowsAppSDKBootstrapAutoInitialize>
+  </PropertyGroup>
+
+  <!-- WinUI 3 Release Configuration - x86 Only -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+    
+    <!-- WinUI 3 Security Settings -->
+    <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+    <AppxPackageSigningTimestampServer>http://timestamp.digicert.com</AppxPackageSigningTimestampServer>
+    
+    <!-- WinUI 3 Performance Settings -->
+    <EnableTypeInfo>false</EnableTypeInfo>
+    <OptimizeReferences>true</OptimizeReferences>
+    <OptimizeImports>true</OptimizeImports>
+    
+    <!-- WinUI 3 Security Compiler Flags -->
+    <AdditionalOptions>/guard:cf /sdl /GS /RTC1 %(AdditionalOptions)</AdditionalOptions>
+    <BufferSecurityCheck>true</BufferSecurityCheck>
+    <ControlFlowGuard>true</ControlFlowGuard>
+    <SpectreMitigation>Spectre</SpectreMitigation>
+    
+    <!-- WinUI 3 Specific -->
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <WindowsAppSDKBootstrapAutoInitialize>true</WindowsAppSDKBootstrapAutoInitialize>
+  </PropertyGroup>
+
+  <!-- WinUI 3 Debug Configuration - x86 Only -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -79,7 +129,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
 
-  <!-- WinUI 3 Security-focused item groups -->
+  <!-- WinUI 3 Security-focused item groups - x64 -->
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <!-- WinUI 3 Security compiler flags -->
@@ -101,8 +151,49 @@
     </Link>
   </ItemDefinitionGroup>
 
-  <!-- WinUI 3 Debug configuration with security -->
+  <!-- WinUI 3 Debug configuration with security - x64 -->
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions>/guard:cf /sdl /GS /RTC1 /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <ControlFlowGuard>true</ControlFlowGuard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_DEBUG;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WINUI3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/GUARD:CF /DYNAMICBASE /NXCOMPAT /HIGHENTROPYVA %(AdditionalOptions)</AdditionalOptions>
+      <ControlFlowGuard>true</ControlFlowGuard>
+      <EnableUAC>true</EnableUAC>
+      <UACExecutionLevel>asInvoker</UACExecutionLevel>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- WinUI 3 Security-focused item groups - x86 -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <!-- WinUI 3 Security compiler flags -->
+      <AdditionalOptions>/guard:cf /sdl /GS /RTC1 /std:c++17 %(AdditionalOptions)</AdditionalOptions>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <ControlFlowGuard>true</ControlFlowGuard>
+      <SpectreMitigation>Spectre</SpectreMitigation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0A00;WINVER=0x0A00;WINUI3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <!-- WinUI 3 Security linker flags -->
+      <AdditionalOptions>/GUARD:CF /DYNAMICBASE /NXCOMPAT /HIGHENTROPYVA %(AdditionalOptions)</AdditionalOptions>
+      <ControlFlowGuard>true</ControlFlowGuard>
+      <EnableUAC>true</EnableUAC>
+      <UACExecutionLevel>asInvoker</UACExecutionLevel>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- WinUI 3 Debug configuration with security - x86 -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalOptions>/guard:cf /sdl /GS /RTC1 /std:c++17 %(AdditionalOptions)</AdditionalOptions>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -132,12 +223,12 @@
   <!-- WinUI 3 Post-build security verification -->
   <Target Name="PostBuildSecurityCheck" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
     <Message Text="Performing WinUI 3 security verification..." Importance="high" />
-    <Message Text="✓ WinUI 3 framework loaded" Importance="high" />
-    <Message Text="✓ Cryptographically secure random generation enabled" Importance="high" />
-    <Message Text="✓ Hardware-based entropy available" Importance="high" />
-    <Message Text="✓ Input validation implemented" Importance="high" />
-    <Message Text="✓ No data leakage detected" Importance="high" />
-    <Message Text="✓ Windows Security APIs integrated" Importance="high" />
+    <Message Text="WinUI 3 framework loaded" Importance="high" />
+    <Message Text="Cryptographically secure random generation enabled" Importance="high" />
+    <Message Text="Hardware-based entropy available" Importance="high" />
+    <Message Text="Input validation implemented" Importance="high" />
+    <Message Text="No data leakage detected" Importance="high" />
+    <Message Text="Windows Security APIs integrated" Importance="high" />
   </Target>
 
   <!-- WinUI 3 Cleanup -->
