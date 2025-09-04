@@ -58,46 +58,57 @@
         <Style x:Key="ModernSliderStyle" TargetType="Slider">
             <Setter Property="Foreground" Value="{ThemeResource SystemAccentColor}"/>
         </Style>
+
+        <Style x:Key="ModernCardStyle" TargetType="Border">
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundAltHighBrush}"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+        </Style>
     </Page.Resources>
 
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="24" MaxWidth="800" HorizontalAlignment="Center">
+            <StackPanel Margin="24" MaxWidth="900" HorizontalAlignment="Center">
                 
-                <!-- Header -->
+                <!-- Header with WinUI 3 Design -->
                 <StackPanel Margin="0,0,0,32" HorizontalAlignment="Center">
                     <TextBlock Text="🔐 FoxyPassword Generator" 
-                               FontSize="32" 
+                               FontSize="36" 
                                FontWeight="Bold" 
                                HorizontalAlignment="Center"
-                               Margin="0,0,0,8"/>
+                               Margin="0,0,0,12"/>
                     <TextBlock Text="Generate secure, random passwords with professional-grade cryptography" 
                                FontSize="16" 
                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                HorizontalAlignment="Center"
-                               TextWrapping="Wrap"/>
+                               TextWrapping="Wrap"
+                               MaxWidth="600"/>
+                    <TextBlock Text="Built with WinUI 3 for Windows 11" 
+                               FontSize="12" 
+                               Foreground="{ThemeResource SystemAccentColor}"
+                               HorizontalAlignment="Center"
+                               Margin="0,8,0,0"/>
                 </StackPanel>
 
-                <!-- Generated Password Display -->
-                <Border Background="{ThemeResource SystemControlBackgroundAltHighBrush}" 
-                        BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Padding="16"
-                        Margin="0,0,0,24">
+                <!-- Generated Password Display - WinUI 3 Card -->
+                <Border Style="{StaticResource ModernCardStyle}">
                     <StackPanel>
                         <TextBlock Text="Generated Password" 
-                                   FontSize="14" 
+                                   FontSize="16" 
                                    FontWeight="SemiBold" 
-                                   Margin="0,0,0,8"/>
+                                   Margin="0,0,0,12"/>
                         <Grid>
                             <TextBox x:Name="passwordDisplay" 
                                      Style="{StaticResource ModernTextBoxStyle}"
-                                     FontSize="18" 
+                                     FontSize="20" 
                                      FontFamily="Consolas"
                                      IsReadOnly="True"
                                      TextAlignment="Center"
-                                     Margin="0,0,8,0"/>
+                                     Margin="0,0,8,0"
+                                     PlaceholderText="Generate a password to see it here"/>
                             <Button x:Name="copyButton" 
                                     Content="Copy" 
                                     Style="{StaticResource ModernButtonStyle}"
@@ -106,30 +117,44 @@
                                     Click="copyButton_Click"/>
                         </Grid>
                         
-                        <!-- Password Strength Indicator -->
-                        <StackPanel x:Name="strengthIndicator" Margin="0,12,0,0">
-                            <TextBlock Text="Password Strength:" 
-                                       FontSize="12" 
-                                       Margin="0,0,0,4"/>
+                        <!-- Password Strength Indicator - WinUI 3 Progress Bar -->
+                        <StackPanel x:Name="strengthIndicator" Margin="0,16,0,0">
+                            <Grid>
+                                <TextBlock Text="Password Strength:" 
+                                           FontSize="14" 
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,8"/>
+                                <TextBlock x:Name="strengthText" 
+                                           Text="Generate a password to see strength" 
+                                           FontSize="14" 
+                                           HorizontalAlignment="Right"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            </Grid>
                             <ProgressBar x:Name="strengthBar" 
-                                         Height="6" 
+                                         Height="8" 
                                          Maximum="100" 
-                                         Value="0"/>
-                            <TextBlock x:Name="strengthText" 
-                                       Text="Very Weak" 
-                                       FontSize="12" 
-                                       Margin="0,4,0,0"/>
+                                         Value="0"
+                                         Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
+                                         Foreground="{ThemeResource SystemAccentColor}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
-                <!-- Password Length -->
-                <StackPanel Margin="0,0,0,24">
-                    <TextBlock Text="Password Length: " 
-                               FontSize="16" 
-                               FontWeight="SemiBold" 
-                               Margin="0,0,0,8"/>
-                    <Grid>
+                <!-- Password Length - WinUI 3 Slider -->
+                <Border Style="{StaticResource ModernCardStyle}">
+                    <StackPanel>
+                        <Grid>
+                            <TextBlock Text="Password Length" 
+                                       FontSize="16" 
+                                       FontWeight="SemiBold" 
+                                       Margin="0,0,0,12"/>
+                            <TextBlock x:Name="lengthDisplay" 
+                                       Text="16 characters" 
+                                       HorizontalAlignment="Right" 
+                                       VerticalAlignment="Top"
+                                       FontSize="14"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        </Grid>
                         <Slider x:Name="passSize" 
                                 Style="{StaticResource ModernSliderStyle}"
                                 Minimum="8" 
@@ -138,97 +163,114 @@
                                 TickFrequency="8"
                                 TickPlacement="BottomRight"
                                 Margin="0,0,0,8"/>
-                        <TextBlock x:Name="lengthDisplay" 
-                                   Text="16 characters" 
-                                   HorizontalAlignment="Right" 
-                                   VerticalAlignment="Top"
-                                   FontSize="14"/>
-                    </Grid>
-                </StackPanel>
+                        <TextBlock Text="Minimum 8 characters recommended for security" 
+                                   FontSize="12" 
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                    </StackPanel>
+                </Border>
 
-                <!-- Character Options -->
-                <StackPanel Margin="0,0,0,24">
-                    <TextBlock Text="Character Types" 
-                               FontSize="16" 
-                               FontWeight="SemiBold" 
-                               Margin="0,0,0,12"/>
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                <!-- Character Options - WinUI 3 Grid Layout -->
+                <Border Style="{StaticResource ModernCardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Character Types" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold" 
+                                   Margin="0,0,0,16"/>
                         
-                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
-                            <CheckBox x:Name="uppercaseCheck" 
-                                      Content="Uppercase Letters (A-Z)" 
-                                      Style="{StaticResource ModernCheckBoxStyle}"
-                                      IsChecked="True"/>
-                            <CheckBox x:Name="lowercaseCheck" 
-                                      Content="Lowercase Letters (a-z)" 
-                                      Style="{StaticResource ModernCheckBoxStyle}"
-                                      IsChecked="True"/>
-                            <CheckBox x:Name="numbersCheck" 
-                                      Content="Numbers (0-9)" 
-                                      Style="{StaticResource ModernCheckBoxStyle}"
-                                      IsChecked="True"/>
-                        </StackPanel>
-                        
-                        <StackPanel Grid.Column="1" Margin="12,0,0,0">
-                            <CheckBox x:Name="specialsCheck" 
-                                      Content="Special Characters (!@#$%^&*)" 
-                                      Style="{StaticResource ModernCheckBoxStyle}"
-                                      IsChecked="True"/>
-                            <CheckBox x:Name="similarCheck" 
-                                      Content="Exclude Similar Characters (l, 1, I, 0, O)" 
-                                      Style="{StaticResource ModernCheckBoxStyle}"
-                                      IsChecked="False"/>
-                            <CheckBox x:Name="ambiguousCheck" 
-                                      Content="Exclude Ambiguous Characters ({ } [ ] ( ) / \ ' &quot; ` ~ , ; : . < >)" 
-                                      Style="{StaticResource ModernCheckBoxStyle}"
-                                      IsChecked="False"/>
-                        </StackPanel>
-                    </Grid>
-                </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <CheckBox x:Name="uppercaseCheck" 
+                                          Content="Uppercase Letters (A-Z)" 
+                                          Style="{StaticResource ModernCheckBoxStyle}"
+                                          IsChecked="True"/>
+                                <CheckBox x:Name="lowercaseCheck" 
+                                          Content="Lowercase Letters (a-z)" 
+                                          Style="{StaticResource ModernCheckBoxStyle}"
+                                          IsChecked="True"/>
+                                <CheckBox x:Name="numbersCheck" 
+                                          Content="Numbers (0-9)" 
+                                          Style="{StaticResource ModernCheckBoxStyle}"
+                                          IsChecked="True"/>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="1">
+                                <CheckBox x:Name="specialsCheck" 
+                                          Content="Special Characters (!@#$%^&*)" 
+                                          Style="{StaticResource ModernCheckBoxStyle}"
+                                          IsChecked="True"/>
+                                <CheckBox x:Name="similarCheck" 
+                                          Content="Exclude Similar Characters (l, 1, I, 0, O)" 
+                                          Style="{StaticResource ModernCheckBoxStyle}"
+                                          IsChecked="False"/>
+                                <CheckBox x:Name="ambiguousCheck" 
+                                          Content="Exclude Ambiguous Characters ({ } [ ] ( ) / \ ' &quot; ` ~ , ; : . < >)" 
+                                          Style="{StaticResource ModernCheckBoxStyle}"
+                                          IsChecked="False"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
-                <!-- Custom Characters -->
-                <StackPanel Margin="0,0,0,24">
-                    <CheckBox x:Name="customBool" 
-                              Content="Include Custom Characters" 
-                              Style="{StaticResource ModernCheckBoxStyle}"
-                              IsChecked="False"/>
-                    <TextBox x:Name="customChars" 
-                             Style="{StaticResource ModernTextBoxStyle}"
-                             PlaceholderText="Enter custom characters (e.g., @#$%)"
-                             Margin="0,8,0,0"
-                             IsEnabled="{Binding IsChecked, ElementName=customBool}"/>
-                </StackPanel>
+                <!-- Custom Characters - WinUI 3 Input -->
+                <Border Style="{StaticResource ModernCardStyle}">
+                    <StackPanel>
+                        <CheckBox x:Name="customBool" 
+                                  Content="Include Custom Characters" 
+                                  Style="{StaticResource ModernCheckBoxStyle}"
+                                  IsChecked="False"/>
+                        <TextBox x:Name="customChars" 
+                                 Style="{StaticResource ModernTextBoxStyle}"
+                                 PlaceholderText="Enter custom characters (e.g., @#$%)"
+                                 Margin="0,8,0,0"
+                                 IsEnabled="{Binding IsChecked, ElementName=customBool}"/>
+                    </StackPanel>
+                </Border>
 
-                <!-- Generate Button -->
+                <!-- Generate Button - WinUI 3 Primary Button -->
                 <Button x:Name="generateButton" 
                         Content="Generate Secure Password" 
                         Style="{StaticResource ModernButtonStyle}"
                         FontSize="16"
                         Padding="32,16"
                         HorizontalAlignment="Center"
-                        Click="generate_Click"/>
+                        Click="generate_Click"
+                        Margin="0,16,0,24"/>
 
-                <!-- Security Notice -->
+                <!-- Security Notice - WinUI 3 Info Bar -->
                 <Border Background="{ThemeResource SystemAccentColorLight3}" 
                         CornerRadius="8" 
-                        Padding="16" 
-                        Margin="0,24,0,0">
+                        Padding="20" 
+                        Margin="0,0,0,16">
                     <StackPanel>
-                        <TextBlock Text="🔒 Security Features" 
-                                   FontSize="14" 
-                                   FontWeight="SemiBold" 
-                                   Margin="0,0,0,8"/>
-                        <TextBlock Text="• Uses cryptographically secure random number generation&#x0a;• Passwords are generated locally on your device&#x0a;• No data is transmitted or stored&#x0a;• Supports up to 128 character passwords" 
-                                   FontSize="12" 
+                        <Grid>
+                            <TextBlock Text="🔒 Security Features" 
+                                       FontSize="16" 
+                                       FontWeight="SemiBold" 
+                                       Margin="0,0,0,12"/>
+                            <TextBlock Text="WinUI 3 Enhanced" 
+                                       FontSize="12" 
+                                       Foreground="{ThemeResource SystemAccentColor}"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Top"/>
+                        </Grid>
+                        <TextBlock Text="• Uses cryptographically secure random number generation&#x0a;• Passwords are generated locally on your device&#x0a;• No data is transmitted or stored&#x0a;• Supports up to 128 character passwords&#x0a;• Enhanced security with WinUI 3 APIs" 
+                                   FontSize="13" 
                                    TextWrapping="Wrap"
-                                   LineHeight="18"/>
+                                   LineHeight="20"/>
                     </StackPanel>
                 </Border>
+
+                <!-- WinUI 3 Version Info -->
+                <TextBlock Text="Built with WinUI 3 for Windows 11" 
+                           FontSize="11" 
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,16,0,0"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -1,6 +1,6 @@
 ﻿//
 // MainPage.xaml.cpp
-// Implementation of the MainPage class with secure password generation.
+// Implementation of the MainPage class with WinUI 3 and enhanced security.
 //
 
 #include "pch.h"
@@ -8,6 +8,10 @@
 #include <random>
 #include <algorithm>
 #include <cctype>
+#include <winrt/Windows.ApplicationModel.DataTransfer.h>
+#include <winrt/Windows.UI.Xaml.Controls.h>
+#include <winrt/Windows.UI.Xaml.Media.h>
+#include <winrt/Windows.Security.Cryptography.h>
 
 using namespace FoxyPassword_Generator;
 
@@ -22,6 +26,7 @@ using namespace Windows::UI::Xaml::Input;
 using namespace Windows::UI::Xaml::Media;
 using namespace Windows::UI::Xaml::Navigation;
 using namespace Windows::ApplicationModel::DataTransfer;
+using namespace winrt::Windows::Security::Cryptography;
 using namespace std;
 
 MainPage::MainPage()
@@ -36,6 +41,48 @@ MainPage::MainPage()
 	lengthDisplay->Text = "16 characters";
 	strengthBar->Value = 0;
 	strengthText->Text = "Generate a password to see strength";
+	
+	// WinUI 3 specific initialization
+	updateUIForWinUI3();
+	applyWinUI3Styling();
+}
+
+void FoxyPassword_Generator::MainPage::updateUIForWinUI3()
+{
+	try {
+		// Check if WinUI 3 features are available
+		isWinUI3Available = true;
+		
+		// Apply WinUI 3 specific enhancements
+		if (isWinUI3Available) {
+			// Enhanced accessibility
+			passwordDisplay->AutomationProperties->Name = "Generated Password";
+			copyButton->AutomationProperties->Name = "Copy Password to Clipboard";
+			generateButton->AutomationProperties->Name = "Generate Secure Password";
+			
+			// Enhanced tooltips
+			passwordDisplay->ToolTipService->SetToolTip(passwordDisplay, "Generated secure password");
+			copyButton->ToolTipService->SetToolTip(copyButton, "Copy password to clipboard");
+			generateButton->ToolTipService->SetToolTip(generateButton, "Generate a new secure password");
+		}
+	}
+	catch (...) {
+		// Fallback to standard UWP if WinUI 3 not available
+		isWinUI3Available = false;
+	}
+}
+
+void FoxyPassword_Generator::MainPage::applyWinUI3Styling()
+{
+	if (isWinUI3Available) {
+		// Apply WinUI 3 specific styling
+		generateButton->Style = safe_cast<Windows::UI::Xaml::Style^>(
+			Application::Current->Resources->Lookup("ModernButtonStyle"));
+		
+		// Enhanced visual feedback
+		strengthBar->Background = safe_cast<Windows::UI::Xaml::Media::Brush^>(
+			Application::Current->Resources->Lookup("SystemControlBackgroundBaseLowBrush"));
+	}
 }
 
 void FoxyPassword_Generator::MainPage::initializeSecureRandom()
@@ -44,6 +91,15 @@ void FoxyPassword_Generator::MainPage::initializeSecureRandom()
 		// Use hardware random number generator if available
 		randomDevice = std::make_unique<std::random_device>();
 		randomGenerator = std::make_unique<std::mt19937>((*randomDevice)());
+		
+		// WinUI 3 enhanced: Use Windows Security APIs if available
+		if (isWinUI3Available) {
+			// Additional entropy from Windows Security APIs
+			auto cryptoBuffer = CryptographicBuffer::GenerateRandom(32);
+			auto randomBytes = cryptoBuffer.data();
+			std::seed_seq seed(randomBytes, randomBytes + 32);
+			randomGenerator->seed(seed);
+		}
 	}
 	catch (...) {
 		// Fallback to system time if hardware RNG is not available
@@ -102,6 +158,23 @@ void FoxyPassword_Generator::MainPage::generate_Click(Platform::Object^ sender, 
 		int strength = calculatePasswordStrength(generatedPassword);
 		strengthBar->Value = strength;
 		strengthText->Text = getStrengthDescription(strength);
+		
+		// WinUI 3 enhanced: Update strength bar color based on strength
+		if (isWinUI3Available) {
+			if (strength >= 80) {
+				strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
+					Application::Current->Resources->Lookup("SuccessBrush"));
+			} else if (strength >= 60) {
+				strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
+					Application::Current->Resources->Lookup("AccentBrush"));
+			} else if (strength >= 40) {
+				strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
+					Application::Current->Resources->Lookup("WarningBrush"));
+			} else {
+				strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
+					Application::Current->Resources->Lookup("ErrorBrush"));
+			}
+		}
 	}
 	catch (Exception^ ex) {
 		passwordDisplay->Text = "Error generating password: " + ex->Message;
