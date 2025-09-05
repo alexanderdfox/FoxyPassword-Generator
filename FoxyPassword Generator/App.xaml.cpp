@@ -34,12 +34,12 @@ App::App()
     InitializeComponent();
     
     // Enhanced application lifecycle management
-    Suspending += ref new SuspendingEventHandler(this, &App::OnSuspending);
+    Suspending += ref new Windows::UI::Xaml::SuspendingEventHandler(this, &App::OnSuspending);
     Resuming += ref new EventHandler<Object^>(this, &App::OnResuming);
     
     // Security: Clear sensitive data on app termination
-    EnteredBackground += ref new EnteredBackgroundEventHandler(this, &App::OnEnteredBackground);
-    LeavingBackground += ref new LeavingBackgroundEventHandler(this, &App::OnLeavingBackground);
+    EnteredBackground += ref new Windows::UI::Xaml::EnteredBackgroundEventHandler(this, &App::OnEnteredBackground);
+    LeavingBackground += ref new Windows::UI::Xaml::LeavingBackgroundEventHandler(this, &App::OnLeavingBackground);
     
     // Initialize security settings
     InitializeSecuritySettings();
@@ -58,7 +58,7 @@ void App::InitializeSecuritySettings()
         // This is handled in MainPage initialization
         
         // Set up proper error handling
-        UnhandledException += ref new UnhandledExceptionEventHandler(this, &App::OnUnhandledException);
+        UnhandledException += ref new Windows::UI::Xaml::UnhandledExceptionEventHandler(this, &App::OnUnhandledException);
     }
     catch (...) {
         // Handle initialization errors gracefully
@@ -85,7 +85,7 @@ void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEvent
     }
 #endif
 
-    auto rootFrame = dynamic_cast<Frame^>(Window::Current->Content);
+    auto rootFrame = dynamic_cast<Windows::UI::Xaml::Controls::Frame^>(Windows::UI::Xaml::Window::Current->Content);
 
     // Do not repeat app initialization when the Window already has content,
     // just ensure that the window is active
@@ -93,7 +93,7 @@ void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEvent
     {
         // Create a Frame to act as the navigation context and associate it with
         // a SuspensionManager key
-        rootFrame = ref new Frame();
+        rootFrame = ref new Windows::UI::Xaml::Controls::Frame();
 
         rootFrame->NavigationFailed += ref new Windows::UI::Xaml::Navigation::NavigationFailedEventHandler(this, &App::OnNavigationFailed);
 
@@ -122,9 +122,9 @@ void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEvent
                 rootFrame->Navigate(TypeName(MainPage::typeid), e->Arguments);
             }
             // Place the frame in the current Window
-            Window::Current->Content = rootFrame;
+            Windows::UI::Xaml::Window::Current->Content = rootFrame;
             // Ensure the current window is active
-            Window::Current->Activate();
+            Windows::UI::Xaml::Window::Current->Activate();
         }
     }
     else
@@ -139,7 +139,7 @@ void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEvent
                 rootFrame->Navigate(TypeName(MainPage::typeid), e->Arguments);
             }
             // Ensure the current window is active
-            Window::Current->Activate();
+            Windows::UI::Xaml::Window::Current->Activate();
         }
     }
     
@@ -208,9 +208,7 @@ void App::OnSuspending(Object^ sender, SuspendingEventArgs^ e)
     catch (...) {
         // Handle suspension errors gracefully
     }
-    finally {
-        deferral->Complete();
-    }
+    deferral->Complete();
 }
 
 /// <summary>
@@ -333,7 +331,7 @@ void App::ResumeOperations()
 /// </summary>
 /// <param name="sender">The source of the exception</param>
 /// <param name="e">Details about the exception</param>
-void App::OnUnhandledException(Object^ sender, UnhandledExceptionEventArgs^ e)
+void App::OnUnhandledException(Object^ sender, Windows::UI::Xaml::UnhandledExceptionEventArgs^ e)
 {
     try {
         // Log the exception for debugging

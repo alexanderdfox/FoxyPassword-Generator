@@ -69,18 +69,18 @@ void FoxyPassword_Generator::MainPage::updateUIForWinUI3()
 		
 		// Apply WinUI 3 specific enhancements
 		if (isWinUI3Available) {
-			// Enhanced accessibility
-			passwordDisplay->AutomationProperties->Name = "Generated Password";
-			copyButton->AutomationProperties->Name = "Copy Password to Clipboard";
-			generateButton->AutomationProperties->Name = "Generate Secure Password";
+					// Enhanced accessibility
+		Windows::UI::Xaml::Automation::AutomationProperties::SetName(passwordDisplay, "Generated Password");
+		Windows::UI::Xaml::Automation::AutomationProperties::SetName(copyButton, "Copy Password to Clipboard");
+		Windows::UI::Xaml::Automation::AutomationProperties::SetName(generateButton, "Generate Secure Password");
 			
-			// Enhanced tooltips with security information
-			passwordDisplay->ToolTipService->SetToolTip(passwordDisplay, "Cryptographically secure password");
-			copyButton->ToolTipService->SetToolTip(copyButton, "Copy password to clipboard");
-			generateButton->ToolTipService->SetToolTip(generateButton, "Generate a new cryptographically secure password");
+					// Enhanced tooltips with security information
+		Windows::UI::Xaml::Controls::ToolTipService::SetToolTip(passwordDisplay, "Cryptographically secure password");
+		Windows::UI::Xaml::Controls::ToolTipService::SetToolTip(copyButton, "Copy password to clipboard");
+		Windows::UI::Xaml::Controls::ToolTipService::SetToolTip(generateButton, "Generate a new cryptographically secure password");
 			
-			// Security indicators
-			passSize->ToolTipService->SetToolTip(passSize, "Password length (8-128 characters recommended)");
+					// Security indicators
+		Windows::UI::Xaml::Controls::ToolTipService::SetToolTip(passSize, "Password length (8-128 characters recommended)");
 		}
 	}
 	catch (...) {
@@ -93,13 +93,13 @@ void FoxyPassword_Generator::MainPage::applyWinUI3Styling()
 {
 	if (isWinUI3Available) {
 		try {
-			// Apply WinUI 3 specific styling
-			generateButton->Style = safe_cast<Windows::UI::Xaml::Style^>(
-				Application::Current->Resources->Lookup("ModernButtonStyle"));
+					// Apply WinUI 3 specific styling
+		generateButton->Style = safe_cast<Windows::UI::Xaml::Style^>(
+			Windows::UI::Xaml::Application::Current->Resources->Lookup("ModernButtonStyle"));
 			
-			// Enhanced visual feedback
-			strengthBar->Background = safe_cast<Windows::UI::Xaml::Media::Brush^>(
-				Application::Current->Resources->Lookup("SystemControlBackgroundBaseLowBrush"));
+					// Enhanced visual feedback
+		strengthBar->Background = safe_cast<Windows::UI::Xaml::Media::Brush^>(
+			Windows::UI::Xaml::Application::Current->Resources->Lookup("SystemControlBackgroundBaseLowBrush"));
 		}
 		catch (...) {
 			// Fallback styling
@@ -183,7 +183,7 @@ wchar_t FoxyPassword_Generator::MainPage::getRandomChar(String ^ charSet)
 	if (charSet->Length() == 0) return L' ';
 	
 	int index = getSecureRandomNumber(0, charSet->Length());
-	return charSet[index];
+	return charSet->Data()[index];
 }
 
 bool FoxyPassword_Generator::MainPage::validateInput(int length, bool uppercase, bool lowercase, bool numbers, bool specials, String ^ customChars)
@@ -218,7 +218,7 @@ void FoxyPassword_Generator::MainPage::generate_Click(Platform::Object^ sender, 
 		bool lowercase = lowercaseCheck->IsChecked->Value;
 		bool numbers = numbersCheck->IsChecked->Value;
 		bool specials = specialsCheck->IsChecked->Value;
-		String ^ customChars = customBool->IsChecked->Value ? customChars->Text : "";
+		String ^ customChars = customBool->IsChecked->Value ? customCharsTextBox->Text : "";
 		
 		if (!validateInput(length, uppercase, lowercase, numbers, specials, customChars)) {
 			passwordDisplay->Text = "Invalid input. Please check your settings.";
@@ -263,19 +263,19 @@ void FoxyPassword_Generator::MainPage::updateStrengthIndicator(int strength)
 	// WinUI 3 enhanced: Update strength bar color based on strength
 	if (isWinUI3Available) {
 		try {
-			if (strength >= 80) {
-				strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
-					Application::Current->Resources->Lookup("SuccessBrush"));
-			} else if (strength >= 60) {
-				strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
-					Application::Current->Resources->Lookup("AccentBrush"));
-			} else if (strength >= 40) {
-				strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
-					Application::Current->Resources->Lookup("WarningBrush"));
-			} else {
-				strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
-					Application::Current->Resources->Lookup("ErrorBrush"));
-			}
+					if (strength >= 80) {
+			strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
+				Windows::UI::Xaml::Application::Current->Resources->Lookup("SuccessBrush"));
+		} else if (strength >= 60) {
+			strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
+				Windows::UI::Xaml::Application::Current->Resources->Lookup("AccentBrush"));
+		} else if (strength >= 40) {
+			strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
+				Windows::UI::Xaml::Application::Current->Resources->Lookup("WarningBrush"));
+		} else {
+			strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
+				Windows::UI::Xaml::Application::Current->Resources->Lookup("ErrorBrush"));
+		}
 		}
 		catch (...) {
 			// Fallback to default color
@@ -293,18 +293,43 @@ String ^ FoxyPassword_Generator::MainPage::generateSecurePassword(int length, bo
 	
 	// Apply exclusions for similar characters
 	if (excludeSimilar) {
-		uppercaseChars = uppercaseChars->Replace("I", "")->Replace("O", "")->Replace("Q", "");
-		lowercaseChars = lowercaseChars->Replace("l", "")->Replace("o", "")->Replace("q", "");
-		numberChars = numberChars->Replace("0", "")->Replace("1", "")->Replace("6", "")->Replace("8", "")->Replace("9", "");
+		std::wstring upperStr(uppercaseChars->Data());
+		std::wstring lowerStr(lowercaseChars->Data());
+		std::wstring numStr(numberChars->Data());
+		
+		// Remove similar characters
+		upperStr.erase(std::remove(upperStr.begin(), upperStr.end(), L'I'), upperStr.end());
+		upperStr.erase(std::remove(upperStr.begin(), upperStr.end(), L'O'), upperStr.end());
+		upperStr.erase(std::remove(upperStr.begin(), upperStr.end(), L'Q'), upperStr.end());
+		
+		lowerStr.erase(std::remove(lowerStr.begin(), lowerStr.end(), L'l'), lowerStr.end());
+		lowerStr.erase(std::remove(lowerStr.begin(), lowerStr.end(), L'o'), lowerStr.end());
+		lowerStr.erase(std::remove(lowerStr.begin(), lowerStr.end(), L'q'), lowerStr.end());
+		
+		numStr.erase(std::remove(numStr.begin(), numStr.end(), L'0'), numStr.end());
+		numStr.erase(std::remove(numStr.begin(), numStr.end(), L'1'), numStr.end());
+		numStr.erase(std::remove(numStr.begin(), numStr.end(), L'6'), numStr.end());
+		numStr.erase(std::remove(numStr.begin(), numStr.end(), L'8'), numStr.end());
+		numStr.erase(std::remove(numStr.begin(), numStr.end(), L'9'), numStr.end());
+		
+		uppercaseChars = ref new String(upperStr.c_str());
+		lowercaseChars = ref new String(lowerStr.c_str());
+		numberChars = ref new String(numStr.c_str());
 	}
 	
 	// Apply exclusions for ambiguous characters
 	if (excludeAmbiguous) {
-		specialChars = specialChars->Replace("{", "")->Replace("}", "")->Replace("[", "")->Replace("]", "")
-			->Replace("(", "")->Replace(")", "")->Replace("/", "")->Replace("\\", "")
-			->Replace("'", "")->Replace("\"", "")->Replace("`", "")->Replace("~", "")
-			->Replace(",", "")->Replace(";", "")->Replace(":", "")->Replace(".", "")
-			->Replace("<", "")->Replace(">", "")->Replace("|", "");
+		std::wstring specialStr(specialChars->Data());
+		
+		// Remove ambiguous characters
+		const wchar_t* ambiguous[] = {L"{", L"}", L"[", L"]", L"(", L")", L"/", L"\\", 
+									  L"'", L"\"", L"`", L"~", L",", L";", L":", L".", L"<", L">", L"|"};
+		
+		for (const wchar_t* amb : ambiguous) {
+			specialStr.erase(std::remove(specialStr.begin(), specialStr.end(), amb[0]), specialStr.end());
+		}
+		
+		specialChars = ref new String(specialStr.c_str());
 	}
 
 	// Build available character set
@@ -316,7 +341,7 @@ String ^ FoxyPassword_Generator::MainPage::generateSecurePassword(int length, bo
 	if (customChars->Length() > 0) availableChars += customChars;
 
 	if (availableChars->Length() == 0) {
-		throw ref new Exception("No character types selected");
+		throw ref new Platform::Exception(E_INVALIDARG, "No character types selected");
 	}
 
 	// Generate password ensuring at least one character from each selected type
@@ -363,7 +388,7 @@ int FoxyPassword_Generator::MainPage::calculatePasswordStrength(String ^ passwor
 	
 	// Character variety analysis
 	for (int i = 0; i < password->Length(); i++) {
-		wchar_t c = password[i];
+		wchar_t c = password->Data()[i];
 		if (isupper(c)) hasUppercase = true;
 		else if (islower(c)) hasLowercase = true;
 		else if (isdigit(c)) hasNumbers = true;
@@ -389,7 +414,7 @@ int FoxyPassword_Generator::MainPage::calculatePasswordStrength(String ^ passwor
 	int uniqueChars = 0;
 	std::vector<wchar_t> seenChars;
 	for (int i = 0; i < password->Length(); i++) {
-		wchar_t c = password[i];
+		wchar_t c = password->Data()[i];
 		if (std::find(seenChars.begin(), seenChars.end(), c) == seenChars.end()) {
 			seenChars.push_back(c);
 			uniqueChars++;
@@ -419,9 +444,9 @@ void FoxyPassword_Generator::MainPage::copyButton_Click(Platform::Object^ sender
 		passwordDisplay->Text != "Invalid input. Please check your settings.") {
 		
 		try {
-			DataPackage^ dataPackage = ref new DataPackage();
+			Windows::ApplicationModel::DataTransfer::DataPackage^ dataPackage = ref new Windows::ApplicationModel::DataTransfer::DataPackage();
 			dataPackage->SetText(passwordDisplay->Text);
-			Clipboard::SetContent(dataPackage);
+			Windows::ApplicationModel::DataTransfer::Clipboard::SetContent(dataPackage);
 			
 			// Visual feedback with modern async pattern
 			copyButton->Content = "Copied!";
