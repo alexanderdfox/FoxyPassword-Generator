@@ -218,9 +218,9 @@ void FoxyPassword_Generator::MainPage::generate_Click(Platform::Object^ sender, 
 		bool lowercase = lowercaseCheck->IsChecked->Value;
 		bool numbers = numbersCheck->IsChecked->Value;
 		bool specials = specialsCheck->IsChecked->Value;
-		String ^ customChars = customBool->IsChecked->Value ? customCharsTextBox->Text : "";
+		String ^ customCharsText = customBool->IsChecked->Value ? customChars->Text : "";
 		
-		if (!validateInput(length, uppercase, lowercase, numbers, specials, customChars)) {
+		if (!validateInput(length, uppercase, lowercase, numbers, specials, customCharsText)) {
 			passwordDisplay->Text = "Invalid input. Please check your settings.";
 			return;
 		}
@@ -234,7 +234,7 @@ void FoxyPassword_Generator::MainPage::generate_Click(Platform::Object^ sender, 
 			specials,
 			similarCheck->IsChecked->Value,
 			ambiguousCheck->IsChecked->Value,
-			customChars
+			customCharsText
 		);
 
 		passwordDisplay->Text = generatedPassword;
@@ -348,24 +348,24 @@ String ^ FoxyPassword_Generator::MainPage::generateSecurePassword(int length, bo
 	String ^ password = "";
 	
 	// First, ensure we have at least one character from each selected type
-	if (uppercase && password->Length() < length) {
+	if (uppercase && password->Length() < static_cast<unsigned int>(length)) {
 		password += getRandomChar(uppercaseChars);
 	}
-	if (lowercase && password->Length() < length) {
+	if (lowercase && password->Length() < static_cast<unsigned int>(length)) {
 		password += getRandomChar(lowercaseChars);
 	}
-	if (numbers && password->Length() < length) {
+	if (numbers && password->Length() < static_cast<unsigned int>(length)) {
 		password += getRandomChar(numberChars);
 	}
-	if (specials && password->Length() < length) {
+	if (specials && password->Length() < static_cast<unsigned int>(length)) {
 		password += getRandomChar(specialChars);
 	}
-	if (customChars->Length() > 0 && password->Length() < length) {
+	if (customChars->Length() > 0 && password->Length() < static_cast<unsigned int>(length)) {
 		password += getRandomChar(customChars);
 	}
 
 	// Fill the rest with random characters from the available set
-	while (password->Length() < length) {
+	while (password->Length() < static_cast<unsigned int>(length)) {
 		password += getRandomChar(availableChars);
 	}
 
@@ -387,7 +387,7 @@ int FoxyPassword_Generator::MainPage::calculatePasswordStrength(String ^ passwor
 	score += min(password->Length() * 3, 50);
 	
 	// Character variety analysis
-	for (int i = 0; i < password->Length(); i++) {
+	for (int i = 0; i < static_cast<int>(password->Length()); i++) {
 		wchar_t c = password->Data()[i];
 		if (isupper(c)) hasUppercase = true;
 		else if (islower(c)) hasLowercase = true;
@@ -413,7 +413,7 @@ int FoxyPassword_Generator::MainPage::calculatePasswordStrength(String ^ passwor
 	// Entropy-based scoring
 	int uniqueChars = 0;
 	std::vector<wchar_t> seenChars;
-	for (int i = 0; i < password->Length(); i++) {
+	for (int i = 0; i < static_cast<int>(password->Length()); i++) {
 		wchar_t c = password->Data()[i];
 		if (std::find(seenChars.begin(), seenChars.end(), c) == seenChars.end()) {
 			seenChars.push_back(c);
@@ -422,7 +422,7 @@ int FoxyPassword_Generator::MainPage::calculatePasswordStrength(String ^ passwor
 	}
 	
 	// Bonus for character diversity
-	if (uniqueChars > password->Length() * 0.7) score += 10;
+	if (uniqueChars > static_cast<int>(password->Length() * 0.7)) score += 10;
 	
 	return max(0, min(100, score));
 }
