@@ -1,2 +1,0 @@
-x64\Release\split.pri
-x64\Release\split.map.txt

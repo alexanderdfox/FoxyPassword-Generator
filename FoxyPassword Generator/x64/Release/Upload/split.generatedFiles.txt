@@ -1,2 +1,0 @@
-x64\Release\Upload\split.pri
-x64\Release\Upload\split.map.txt

@@ -1,2 +1,0 @@
-ARM\Release\filemap.pri
-ARM\Release\filemap.map.txt

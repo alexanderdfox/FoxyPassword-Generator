@@ -20,10 +20,27 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
+                        <Border x:Name="Border" 
+                                Background="{TemplateBinding Background}" 
                                 CornerRadius="{TemplateBinding CornerRadius}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 BorderBrush="{TemplateBinding BorderBrush}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="Border.Background" Value="{ThemeResource SystemAccentColorLight1}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="Border.Background" Value="{ThemeResource SystemAccentColorDark1}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled"/>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
                             <ContentPresenter HorizontalAlignment="Center" 
                                             VerticalAlignment="Center"
                                             Margin="{TemplateBinding Padding}"/>
@@ -31,14 +48,6 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsPointerOver" Value="True">
-                    <Setter Property="Background" Value="{ThemeResource SystemAccentColorLight1}"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="{ThemeResource SystemAccentColorDark1}"/>
-                </Trigger>
-            </Style.Triggers>
         </Style>
 
         <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">

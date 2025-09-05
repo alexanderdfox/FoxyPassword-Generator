@@ -1,2 +1,0 @@
-MainPackage=C:\Users\Alex Fox\Documents\Visual Studio 2017\Projects\FoxyPassword Generator\Release\FoxyPassword Generator\Upload\FoxyPassword Generator_1.1.1.0_Win32.appx
-SymbolPackage=C:\Users\Alex Fox\Desktop\FoxyPassword Generator_1.1.1.0\FoxyPassword Generator_1.1.1.0_Win32.appxsym

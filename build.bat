@@ -1,10 +1,13 @@
 @echo off
-REM Build Script for FoxyPassword Generator
-REM Run this script on Windows with Visual Studio installed
+REM Clean Build Script for FoxyPassword Generator
+REM This script provides a clean build experience
 
 echo ========================================
-echo Building FoxyPassword Generator (Secure)
+echo FoxyPassword Generator - Clean Build
 echo ========================================
+
+echo.
+echo [1/3] Checking project structure...
 
 REM Check if we're in the right directory
 if not exist "FoxyPassword Generator.sln" (
@@ -14,40 +17,21 @@ if not exist "FoxyPassword Generator.sln" (
     exit /b 1
 )
 
+echo Project structure verified ✓
+
 echo.
-echo [1/4] Checking Visual Studio installation...
-where msbuild >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: MSBuild not found!
-    echo Please install Visual Studio 2019/2022 with C++/WinRT workload.
-    echo Or run from "Developer Command Prompt for VS"
-    pause
-    exit /b 1
-)
+echo [2/3] Building Release x64...
 
-echo [2/4] Cleaning previous builds...
-if exist "FoxyPassword Generator\Release" (
-    rmdir /s /q "FoxyPassword Generator\Release"
-    echo Cleaned Release directory.
-)
-
-echo [3/4] Building solution...
-msbuild "FoxyPassword Generator.sln" ^
-    /p:Configuration=Release ^
-    /p:Platform=x64 ^
-    /p:AppxPackageSigningEnabled=true ^
-    /p:AppxPackageSigningTimestampDigestAlgorithm=SHA256 ^
-    /p:AppxPackageSigningTimestampServer=http://timestamp.digicert.com ^
-    /verbosity:minimal ^
-    /nologo
+REM Build with x64 platform
+msbuild "FoxyPassword Generator.sln" /p:Configuration=Release /p:Platform=x64 /m
 
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo [4/4] Build completed successfully! ✅
+    echo [3/3] Build completed successfully! ✅
     echo.
     echo 📁 Build outputs:
-    echo    Executable: FoxyPassword Generator\Release\PackageLayout\FoxyPassword Generator.exe
-    echo    Package: FoxyPassword Generator\Release\PackageUploadLayout\
+    echo    Executable: FoxyPassword Generator\x64\Release\PackageLayout\FoxyPassword Generator.exe
+    echo    Package: FoxyPassword Generator\x64\Release\PackageUploadLayout\
     echo.
     echo 🔒 Security features included:
     echo    ✓ Cryptographically secure random generation
@@ -66,10 +50,11 @@ if %ERRORLEVEL% EQU 0 (
     echo ❌ Build failed! Please check the error messages above.
     echo.
     echo 🔧 Troubleshooting:
-    echo    - Ensure Visual Studio 2019/2022 is installed
+    echo    - Ensure Visual Studio 2022 is installed
     echo    - Install C++/WinRT workload
-    echo    - Install Windows 10 SDK (10.0.19041.0+)
+    echo    - Install Windows 10 SDK (10.0.22621.0+)
     echo    - Run from Developer Command Prompt
+    echo    - Check docs/ folder for detailed guides
     echo.
 )
 

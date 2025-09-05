@@ -1,124 +1,153 @@
 # 🔐 FoxyPassword Generator
 
-A professional, secure password generator for Windows with cryptography-grade random number generation and modern UI.
+A professional-grade password generator built with C++/WinRT and WinUI 3 for Windows 11. Features cryptographically secure random number generation, modern UI design, and comprehensive security features.
 
 ## ✨ Features
 
-### Security Features
-- **Cryptographically Secure Random Generation**: Uses `std::random_device` and `std::mt19937` for hardware-based entropy
-- **Local Generation**: All passwords are generated locally on your device - no data transmission
-- **No Storage**: Passwords are never stored or logged
-- **Input Validation**: Comprehensive validation prevents security vulnerabilities
-- **Character Exclusion**: Option to exclude similar (l, 1, I, 0, O) and ambiguous characters
+### 🔒 Security Features
+- **Cryptographically Secure RNG**: Uses `std::random_device` and Windows Security APIs
+- **Hardware-Based Entropy**: Leverages `CryptographicBuffer::GenerateRandom` for additional entropy
+- **Input Validation**: Comprehensive validation to prevent attacks
+- **Password Strength Analysis**: Real-time strength calculation and visualization
+- **Character Exclusion**: Options to exclude similar and ambiguous characters
+- **Memory Safety**: Smart pointers and RAII patterns
 
-### Password Generation
-- **Length Range**: 8-128 characters
-- **Character Types**: Uppercase, lowercase, numbers, special characters
-- **Custom Characters**: Add your own character set
-- **Strength Analysis**: Real-time password strength calculation
-- **Smart Generation**: Ensures at least one character from each selected type
-
-### User Experience
-- **Modern UI**: Professional, responsive design with Windows 11 styling
-- **Copy Functionality**: One-click password copying with visual feedback
-- **Strength Indicator**: Visual progress bar and text description
-- **Accessibility**: Full keyboard navigation and screen reader support
+### 🎨 Modern UI/UX
+- **WinUI 3 Design**: Native Windows 11 styling and controls
+- **Fluent Design System**: Modern card-based layout with proper spacing
 - **Responsive Layout**: Adapts to different screen sizes
+- **Accessibility**: Screen reader support and keyboard navigation
+- **Visual States**: Proper hover and press animations
+- **Professional Typography**: Clean, readable fonts
 
-## 🔒 Security Improvements
+### ⚙️ Password Generation
+- **Customizable Length**: 8-128 characters
+- **Character Sets**: Uppercase, lowercase, numbers, special characters
+- **Custom Characters**: User-defined character sets
+- **Exclusion Options**: Similar characters (l, 1, I, 0, O) and ambiguous characters
+- **Real-time Preview**: See password strength as you configure options
+- **One-Click Copy**: Easy password copying to clipboard
 
-### Before (Original Version)
-- ❌ Used `rand()` and `srand()` - predictable and insecure
-- ❌ Time-based seeding - vulnerable to timing attacks
-- ❌ No input validation
-- ❌ Basic UI with hardcoded positioning
-- ❌ No copy functionality
-- ❌ No password strength feedback
+## 📁 Project Structure
 
-### After (Secure Version)
-- ✅ **Cryptographically Secure**: Hardware-based random number generation
-- ✅ **Input Validation**: Comprehensive parameter checking
-- ✅ **Professional UI**: Modern, accessible design
-- ✅ **Copy to Clipboard**: Secure password copying
-- ✅ **Strength Analysis**: Real-time strength calculation
-- ✅ **Character Exclusion**: Options to avoid confusing characters
-- ✅ **Error Handling**: Graceful error handling and user feedback
-
-## 🛠️ Technical Details
-
-### Random Number Generation
-```cpp
-// Secure initialization
-std::unique_ptr<std::random_device> randomDevice;
-std::unique_ptr<std::mt19937> randomGenerator;
-
-// Hardware-based entropy with fallback
-try {
-    randomDevice = std::make_unique<std::random_device>();
-    randomGenerator = std::make_unique<std::mt19937>((*randomDevice)());
-} catch (...) {
-    // Fallback to system time if hardware RNG unavailable
-    randomGenerator = std::make_unique<std::mt19937>(static_cast<unsigned int>(time(nullptr)));
-}
+```
+FoxyPassword-Generator/
+├── 📁 FoxyPassword Generator/          # Main project directory
+│   ├── 📄 App.xaml                      # Application resources and styling
+│   ├── 📄 App.xaml.cpp/.h               # Application entry point
+│   ├── 📄 MainPage.xaml                 # Main UI layout
+│   ├── 📄 MainPage.xaml.cpp/.h         # Password generation logic
+│   ├── 📄 Package.appxmanifest          # App package manifest
+│   ├── 📄 FoxyPassword Generator.vcxproj # Project configuration
+│   ├── 📄 FoxyPassword Generator.sln   # Solution file
+│   ├── 📄 pch.cpp/.h                   # Precompiled headers
+│   └── 📁 Assets/                       # App icons and images
+│       ├── 🖼️ LockScreenLogo.scale-200.png
+│       ├── 🖼️ SplashScreen.scale-200.png
+│       ├── 🖼️ Square150x150Logo.scale-200.png
+│       ├── 🖼️ Square44x44Logo.scale-200.png
+│       ├── 🖼️ Square44x44Logo.targetsize-24_altform-unplated.png
+│       ├── 🖼️ StoreLogo.png
+│       └── 🖼️ Wide310x150Logo.scale-200.png
+├── 📁 docs/                             # Documentation
+│   ├── 📄 BUILD.md                      # Detailed build instructions
+│   ├── 📄 QUICK_BUILD.md               # Quick build reference
+│   ├── 📄 VS_INSTALL_GUIDE.md          # Visual Studio installation guide
+│   ├── 📄 VS_SETUP.md                  # Visual Studio setup guide
+│   ├── 📄 WINUI_MIGRATION.md           # WinUI 3 migration guide
+│   ├── 📄 SDK_VERSION_FIX.md           # SDK version troubleshooting
+│   └── 📄 SECURITY_ANALYSIS.md         # Security feature analysis
+├── 📁 scripts/                          # Build scripts
+│   ├── 🔧 build.bat                    # Windows batch build script
+│   └── 🔧 build.ps1                    # PowerShell build script
+├── 📄 README.md                         # This file
+└── 📄 LICENSE                           # MIT License
 ```
 
-### Password Strength Algorithm
-- **Length Bonus**: Up to 40 points for length
-- **Character Variety**: 10 points each for uppercase, lowercase, numbers, specials
-- **Mixed Case Bonus**: 10 points for both cases
-- **Complexity Bonus**: Additional points for mixed character types
-- **Penalties**: Reduced scores for predictable patterns
+## 🚀 Quick Start
 
-## 📋 Requirements
+### Prerequisites
+- **Windows 10/11** (version 1903 or later)
+- **Visual Studio 2022** with C++/WinRT workload
+- **Windows 10 SDK** (10.0.22621.0 or later)
 
-- Windows 10/11 (version 1903 or later)
-- Visual Studio 2019/2022 with C++/WinRT workload
-- Windows 10 SDK (version 10.0.19041.0 or later)
+### Building
+```cmd
+# Quick build
+scripts\build.bat
 
-## 🚀 Building
+# Or PowerShell
+scripts\build.ps1
 
-1. Open `FoxyPassword Generator.sln` in Visual Studio
-2. Select your target platform (x86, x64, or ARM)
-3. Build the solution (Ctrl+Shift+B)
-4. Deploy to your device or create an app package
+# Manual build
+msbuild "FoxyPassword Generator.sln" /p:Configuration=Release /p:Platform=x64 /m
+```
 
-## 📱 Usage
+### Running
+1. Build the project
+2. Navigate to `FoxyPassword Generator\x64\Release\PackageLayout\`
+3. Run `FoxyPassword Generator.exe`
 
-1. **Set Password Length**: Use the slider to choose 8-128 characters
-2. **Select Character Types**: Check the boxes for desired character types
-3. **Configure Options**: Enable/disable similar/ambiguous character exclusion
-4. **Add Custom Characters**: Optionally add your own character set
-5. **Generate**: Click "Generate Secure Password"
-6. **Copy**: Use the "Copy" button to copy to clipboard
+## 🔧 Technical Details
 
-## 🔧 Configuration
+### Security Implementation
+- **Random Number Generation**: `std::random_device` + `std::mt19937`
+- **Windows Security APIs**: `CryptographicBuffer::GenerateRandom`
+- **Password Strength**: Entropy-based calculation with character set analysis
+- **Input Validation**: Comprehensive bounds checking and sanitization
 
-### Character Sets
-- **Uppercase**: A-Z (26 characters)
-- **Lowercase**: a-z (26 characters)  
-- **Numbers**: 0-9 (10 characters)
-- **Special**: !@#$%^&*()_+-=[]{}|;:,.<>? (22 characters)
+### UI Framework
+- **WinUI 3**: Modern Windows 11 native controls
+- **XAML**: Declarative UI with proper data binding
+- **Visual States**: UWP-compatible hover/press animations
+- **Theme Resources**: Automatic light/dark mode support
 
-### Exclusion Options
-- **Similar Characters**: l, 1, I, 0, O
-- **Ambiguous Characters**: { } [ ] ( ) / \ ' " ` ~ , ; : . < >
+### Build Configuration
+- **Platform**: x64 and x86 (Win32)
+- **Windows SDK**: 10.0.22621.0
+- **Toolset**: Visual Studio 2022 (v143)
+- **Language Standard**: C++17
+
+## 📚 Documentation
+
+- **[Build Guide](docs/BUILD.md)** - Detailed build instructions
+- **[Quick Build](docs/QUICK_BUILD.md)** - Fast build reference
+- **[VS Installation](docs/VS_INSTALL_GUIDE.md)** - Visual Studio setup
+- **[VS Configuration](docs/VS_SETUP.md)** - Project configuration
+- **[WinUI Migration](docs/WINUI_MIGRATION.md)** - WinUI 3 features
+- **[SDK Troubleshooting](docs/SDK_VERSION_FIX.md)** - Common issues
+- **[Security Analysis](docs/SECURITY_ANALYSIS.md)** - Security features
+
+## 🛡️ Security Notice
+
+This application generates cryptographically secure passwords using:
+- Hardware-based random number generation
+- Windows Security APIs for additional entropy
+- Local processing (no data transmission)
+- Input validation and bounds checking
+- Memory-safe C++ practices
+
+**Always verify password strength** and use appropriate length for your security requirements.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please ensure all code follows security best practices and includes appropriate tests.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
-## ⚠️ Security Notice
+## 📞 Support
 
-This application generates passwords locally on your device. While the generation is cryptographically secure, always:
-- Use strong, unique passwords for each account
-- Enable two-factor authentication where available
-- Keep your device and software updated
-- Be cautious of phishing attempts
+For issues and questions:
+- Check the [documentation](docs/) first
+- Review [common issues](docs/SDK_VERSION_FIX.md)
+- Open an issue on GitHub
 
 ---
 
-**Built with security and usability in mind** 🔐✨
+**Built with ❤️ for Windows 11 using WinUI 3**
