@@ -200,7 +200,7 @@
                             
                             <StackPanel Grid.Column="1">
                                 <CheckBox x:Name="specialsCheck" 
-                                          Content="Special Characters (!@#$%^&*)" 
+                                          Content="Special Characters (!@#$%^&amp;*)" 
                                           Style="{StaticResource ModernCheckBoxStyle}"
                                           IsChecked="True"/>
                                 <CheckBox x:Name="similarCheck" 
@@ -208,7 +208,7 @@
                                           Style="{StaticResource ModernCheckBoxStyle}"
                                           IsChecked="False"/>
                                 <CheckBox x:Name="ambiguousCheck" 
-                                          Content="Exclude Ambiguous Characters ({ } [ ] ( ) / \ ' &quot; ` ~ , ; : . < >)" 
+                                          Content="Exclude Ambiguous Characters ({ } [ ] ( ) / \ ' &quot; ` ~ , ; : . &lt; &gt;)" 
                                           Style="{StaticResource ModernCheckBoxStyle}"
                                           IsChecked="False"/>
                             </StackPanel>
