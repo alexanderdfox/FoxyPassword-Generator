@@ -167,6 +167,11 @@ int FoxyPassword_Generator::MainPage::getSecureRandomNumber(int min, int max)
 {
 	if (max <= min) return min;
 	
+	// Ensure random generator is initialized
+	if (!isInitialized || !randomGenerator) {
+		initializeSecureRandom();
+	}
+	
 	// Check if we need to reseed
 	auto now = std::chrono::steady_clock::now();
 	if (std::chrono::duration_cast<std::chrono::seconds>(now - lastReseed).count() > RESEED_INTERVAL_SECONDS) {
@@ -174,16 +179,24 @@ int FoxyPassword_Generator::MainPage::getSecureRandomNumber(int min, int max)
 	}
 	
 	std::lock_guard<std::mutex> lock(randomMutex);
-	std::uniform_int_distribution<int> distribution(min, max - 1);
-	return distribution(*randomGenerator);
+	if (randomGenerator) {
+		std::uniform_int_distribution<int> distribution(min, max - 1);
+		return distribution(*randomGenerator);
+	}
+	
+	// Fallback to simple modulo if random generator is not available
+	return min + (rand() % (max - min));
 }
 
 wchar_t FoxyPassword_Generator::MainPage::getRandomChar(String ^ charSet)
 {
-	if (charSet->Length() == 0) return L' ';
+	if (!charSet || charSet->Length() == 0) return L' ';
 	
 	int index = getSecureRandomNumber(0, charSet->Length());
-	return charSet->Data()[index];
+	if (index >= 0 && index < static_cast<int>(charSet->Length())) {
+		return charSet->Data()[index];
+	}
+	return L' ';
 }
 
 bool FoxyPassword_Generator::MainPage::validateInput(int length, bool uppercase, bool lowercase, bool numbers, bool specials, String ^ customChars)
@@ -212,6 +225,18 @@ bool FoxyPassword_Generator::MainPage::validateInput(int length, bool uppercase,
 void FoxyPassword_Generator::MainPage::generate_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	try {
+		// Ensure random generator is initialized
+		if (!isInitialized || !randomGenerator) {
+			initializeSecureRandom();
+		}
+		
+		// Validate UI elements are available
+		if (!passSize || !uppercaseCheck || !lowercaseCheck || !numbersCheck || 
+			!specialsCheck || !similarCheck || !ambiguousCheck || !customBool || 
+			!customChars || !passwordDisplay || !strengthBar || !strengthText) {
+			return;
+		}
+		
 		// Validate input
 		int length = static_cast<int>(passSize->Value);
 		bool uppercase = uppercaseCheck->IsChecked->Value;
@@ -237,21 +262,35 @@ void FoxyPassword_Generator::MainPage::generate_Click(Platform::Object^ sender, 
 			customCharsText
 		);
 
-		passwordDisplay->Text = generatedPassword;
+		if (generatedPassword && passwordDisplay) {
+			passwordDisplay->Text = generatedPassword;
 
-		// Calculate and display strength
-		int strength = calculatePasswordStrength(generatedPassword);
-		updateStrengthIndicator(strength);
+			// Calculate and display strength
+			int strength = calculatePasswordStrength(generatedPassword);
+			updateStrengthIndicator(strength);
+		}
 	}
 	catch (Exception^ ex) {
-		passwordDisplay->Text = "Error generating password: " + ex->Message;
-		strengthBar->Value = 0;
-		strengthText->Text = "Error";
+		if (passwordDisplay) {
+			passwordDisplay->Text = "Error generating password: " + ex->Message;
+		}
+		if (strengthBar) {
+			strengthBar->Value = 0;
+		}
+		if (strengthText) {
+			strengthText->Text = "Error";
+		}
 	}
 	catch (...) {
-		passwordDisplay->Text = "Unexpected error occurred during password generation";
-		strengthBar->Value = 0;
-		strengthText->Text = "Error";
+		if (passwordDisplay) {
+			passwordDisplay->Text = "Unexpected error occurred during password generation";
+		}
+		if (strengthBar) {
+			strengthBar->Value = 0;
+		}
+		if (strengthText) {
+			strengthText->Text = "Error";
+		}
 	}
 }
 
@@ -371,7 +410,12 @@ String ^ FoxyPassword_Generator::MainPage::generateSecurePassword(int length, bo
 
 	// Shuffle the password to avoid predictable patterns
 	std::wstring passwordStr(password->Data());
-	std::shuffle(passwordStr.begin(), passwordStr.end(), *randomGenerator);
+	{
+		std::lock_guard<std::mutex> lock(randomMutex);
+		if (randomGenerator) {
+			std::shuffle(passwordStr.begin(), passwordStr.end(), *randomGenerator);
+		}
+	}
 	
 	return ref new String(passwordStr.c_str());
 }
