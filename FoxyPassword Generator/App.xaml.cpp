@@ -80,7 +80,6 @@ void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEvent
         DebugSettings->EnableFrameRateCounter = true;
         
         // Enable additional debugging features
-        DebugSettings->IsTextScaleFactorEnabled = true;
         DebugSettings->IsOverdrawHeatMapEnabled = false; // Disable for performance
     }
 #endif
@@ -183,7 +182,7 @@ void App::ClearSensitiveData()
 }
 
 /// <summary>
-/// Invoked when application execution is being suspended. Enhanced with proper state management.
+/// Invoked when the application is being suspended. Enhanced with proper state management.
 /// Application state is saved without knowing whether the application will be terminated or resumed
 /// with the contents of memory still intact.
 /// </summary>
