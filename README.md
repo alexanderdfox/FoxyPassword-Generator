@@ -131,7 +131,7 @@ This application generates cryptographically secure passwords using:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GPL 3 License - see the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
@@ -149,5 +149,6 @@ For issues and questions:
 - Open an issue on GitHub
 
 ---
+
 
 **Built with ❤️ for Windows 11 using WinUI 3**
