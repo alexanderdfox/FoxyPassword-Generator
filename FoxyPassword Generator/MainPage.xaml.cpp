@@ -299,27 +299,27 @@ void FoxyPassword_Generator::MainPage::updateStrengthIndicator(int strength)
 	strengthBar->Value = strength;
 	strengthText->Text = getStrengthDescription(strength);
 	
-	// WinUI 3 enhanced: Update strength bar color based on strength
-	if (isWinUI3Available) {
-		try {
+			// WinUI 3 enhanced: Update strength bar color based on strength
+		if (isWinUI3Available) {
+			try {
 					if (strength >= 80) {
 			strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
-				Windows::UI::Xaml::Application::Current->Resources->Lookup("SuccessBrush"));
+				Windows::UI::Xaml::Application::Current->Resources->Lookup("SystemAccentColor"));
 		} else if (strength >= 60) {
 			strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
-				Windows::UI::Xaml::Application::Current->Resources->Lookup("AccentBrush"));
+				Windows::UI::Xaml::Application::Current->Resources->Lookup("SystemAccentColor"));
 		} else if (strength >= 40) {
 			strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
-				Windows::UI::Xaml::Application::Current->Resources->Lookup("WarningBrush"));
+				Windows::UI::Xaml::Application::Current->Resources->Lookup("SystemAccentColor"));
 		} else {
 			strengthBar->Foreground = safe_cast<Windows::UI::Xaml::Media::Brush^>(
-				Windows::UI::Xaml::Application::Current->Resources->Lookup("ErrorBrush"));
+				Windows::UI::Xaml::Application::Current->Resources->Lookup("SystemAccentColor"));
 		}
 		}
 		catch (...) {
 			// Fallback to default color
 		}
-	}
+		}
 }
 
 String ^ FoxyPassword_Generator::MainPage::generateSecurePassword(int length, bool uppercase, bool lowercase, bool numbers, bool specials, bool excludeSimilar, bool excludeAmbiguous, String ^ customChars)

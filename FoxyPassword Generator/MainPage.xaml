@@ -30,12 +30,12 @@
                                     <VisualState x:Name="Normal"/>
                                     <VisualState x:Name="PointerOver">
                                         <VisualState.Setters>
-                                            <Setter Target="Border.Background" Value="{ThemeResource SystemAccentColorLight1}"/>
+                                            <Setter Target="Border.Background" Value="{ThemeResource SystemAccentColor}"/>
                                         </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Pressed">
                                         <VisualState.Setters>
-                                            <Setter Target="Border.Background" Value="{ThemeResource SystemAccentColorDark1}"/>
+                                            <Setter Target="Border.Background" Value="{ThemeResource SystemAccentColor}"/>
                                         </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Disabled"/>
@@ -53,7 +53,7 @@
         <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundAltHighBrush}"/>
+            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundBaseLowBrush}"/>
             <Setter Property="Padding" Value="12,8"/>
             <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="FontSize" Value="14"/>
@@ -72,7 +72,7 @@
             <Setter Property="CornerRadius" Value="12"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundAltHighBrush}"/>
+            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundBaseLowBrush}"/>
             <Setter Property="Padding" Value="20"/>
             <Setter Property="Margin" Value="0,0,0,16"/>
         </Style>
@@ -251,7 +251,7 @@
                         Margin="0,16,0,24"/>
 
                 <!-- Security Notice - WinUI 3 Info Bar -->
-                <Border Background="{ThemeResource SystemAccentColorLight3}" 
+                <Border Background="{ThemeResource SystemAccentColor}" 
                         CornerRadius="8" 
                         Padding="20" 
                         Margin="0,0,0,16">
