@@ -70,7 +70,6 @@ namespace FoxyPassword_Generator
 		
 		// WinUI 3 Enhanced Security
 		bool isWinUI3Available;
-		CryptographicBuffer cryptoBuffer;
 		
 		// Constants for security
 		static constexpr int MIN_PASSWORD_LENGTH = 8;

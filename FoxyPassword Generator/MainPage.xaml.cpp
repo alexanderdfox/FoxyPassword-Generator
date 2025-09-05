@@ -118,7 +118,7 @@ void FoxyPassword_Generator::MainPage::initializeSecureRandom()
 		if (isWinUI3Available) {
 			try {
 				// Generate additional entropy from Windows Security APIs
-				cryptoBuffer = CryptographicBuffer::GenerateRandom(ENTROPY_BYTES);
+				auto cryptoBuffer = CryptographicBuffer::GenerateRandom(ENTROPY_BYTES);
 				auto randomBytes = cryptoBuffer.data();
 				std::seed_seq seed(randomBytes, randomBytes + ENTROPY_BYTES);
 				randomGenerator->seed(seed);
@@ -145,7 +145,7 @@ void FoxyPassword_Generator::MainPage::reseedRandomGenerator()
 	try {
 		if (isWinUI3Available) {
 			// Reseed with fresh entropy from Windows Security APIs
-			cryptoBuffer = CryptographicBuffer::GenerateRandom(ENTROPY_BYTES);
+			auto cryptoBuffer = CryptographicBuffer::GenerateRandom(ENTROPY_BYTES);
 			auto randomBytes = cryptoBuffer.data();
 			std::seed_seq seed(randomBytes, randomBytes + ENTROPY_BYTES);
 			randomGenerator->seed(seed);
@@ -294,7 +294,7 @@ String ^ FoxyPassword_Generator::MainPage::generateSecurePassword(int length, bo
 	// Apply exclusions for similar characters
 	if (excludeSimilar) {
 		uppercaseChars = uppercaseChars->Replace("I", "")->Replace("O", "")->Replace("Q", "");
-		lowercaseChars = lowercaseChars->Replace("l", "")->Replace("o", "")->Replace("q");
+		lowercaseChars = lowercaseChars->Replace("l", "")->Replace("o", "")->Replace("q", "");
 		numberChars = numberChars->Replace("0", "")->Replace("1", "")->Replace("6", "")->Replace("8", "")->Replace("9", "");
 	}
 	
